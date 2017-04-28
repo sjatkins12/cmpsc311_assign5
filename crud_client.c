@@ -13,6 +13,7 @@
 #include <crud_network.h>
 #include <cmpsc311_log.h>
 #include <cmpsc311_util.h>
+#include <arpa/inet.h>
 
 // Global variables
 int            crud_network_shutdown = 0; // Flag indicating shutdown
