@@ -313,7 +313,7 @@ int32_t crud_write(int16_t fd, void *buf, int32_t count) {
 // Outputs      : 0 if successful or -1 if failure
 
 int32_t crud_seek(int16_t fd, uint32_t loc) {
-]
+
 	if (!initCheck())
 		return (-1);
 
