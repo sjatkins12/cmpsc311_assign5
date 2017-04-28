@@ -47,7 +47,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	CrudResponse *resno = malloc(sizeof(CrudResponse)), resho;
 	CrudRequest *reqno = malloc(sizeof(CrudRequest));
 
-	request = (op >> 28) & 0x0;
+	request = (op >> 28) & 0xF;
 
 	if (request == CRUD_INIT) {
 		sockfd = socket(PF_INET, SOCK_STREAM, 0);
