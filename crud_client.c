@@ -47,7 +47,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	CrudResponse *resno = malloc(sizeof(CrudResponse)), resho;
 	CrudRequest *reqno = malloc(sizeof(CrudRequest));
 
-	request = (op >> 28) | 0x0;
+	request = (op >> 28) & 0x0;
 
 	if (request == CRUD_INIT) {
 		sockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -85,6 +85,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 				&(((char *)buf)[written]), ((op >> 4) & 0xFFFFFF) - written);
 		}
 	}
+
 	reed = read(sockfd, resno, sizeof(CrudResponse));
 	while (reed < sizeof(CrudResponse)) {
 		reed += read(sockfd, &((char *)resno)[reed], sizeof(CrudResponse) - reed);
