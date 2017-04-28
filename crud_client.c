@@ -14,6 +14,8 @@
 #include <cmpsc311_log.h>
 #include <cmpsc311_util.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <errno.h>
 
 // Global variables
 int            crud_network_shutdown = 0; // Flag indicating shutdown
@@ -77,7 +79,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	if (request == CRUD_CREATE || request == CRUD_UPDATE)
 	{
 		written = 0;
-		while (written < (op >> 4) & 0xFFFFFF) {
+		while (written < ((op >> 4) & 0xFFFFFF)) {
 			written += write(sockfd,
 				&((char *)buf)[written], ((op >> 4) & 0xFFFFFF) - written);
 		}
@@ -97,5 +99,11 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 				&((char *) buf)[reed], ((resho >> 4) & 0xFFFFFF) - reed);
 		}
 	}
+
+	if (request == CRUD_CLOSE) {
+		close(sockfd);
+		sockfd = -1;
+	}
+
 	return (resho);
 }
