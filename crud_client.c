@@ -69,6 +69,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 
 
 	*reqno = htonll64(op);
+	written = write(sockfd, reqno, sizeof(CrudRequest));
 	while (written < sizeof(CrudRequest)) {
 		written += write(sockfd,
 			&(((char *) reqno)[written]), sizeof(CrudRequest) - written); 
@@ -78,14 +79,13 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 
 	if (request == CRUD_CREATE || request == CRUD_UPDATE)
 	{
-		written = 0;
+		written = write(sockfd, buf, ((op >> 4) & 0xFFFFFF));
 		while (written < ((op >> 4) & 0xFFFFFF)) {
-			printf("WRITTING\n");
 			written += write(sockfd,
 				&(((char *)buf)[written]), ((op >> 4) & 0xFFFFFF) - written);
 		}
 	}
-
+	reed = read(sockfd, resno, sizeof(CrudResponse));
 	while (reed < sizeof(CrudResponse)) {
 		reed += read(sockfd, &((char *)resno)[reed], sizeof(CrudResponse) - reed);
 	}
@@ -94,7 +94,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	free(resno);
 
 	if (request == CRUD_READ) {
-		reed = 0;
+		reed = read(sockfd, buf, ((op >> 4) & 0xFFFFFF));
 		while (reed < ((resho >> 4) & 0xFFFFFF)) {
 			printf("READING\n");
 			reed += read(sockfd, 
