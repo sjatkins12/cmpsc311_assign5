@@ -51,7 +51,7 @@ int initCheck() {
 
 	if (initFlag == 0) {
 		request = construct_crud_request(0, CRUD_INIT, 0, 0, 0);
-		response = crud_bus_request(request, NULL); // Initialize Object Store
+		response = crud_client_operation(request, NULL); // Initialize Object Store
 		if (response & 0x1) //Sucsessfull CRUD Request
 			return (0); // Failure to create new Object Store
 		initFlag = 1;
@@ -87,7 +87,7 @@ int16_t crud_open(char *path) {
 		buff = malloc(CRUD_MAX_OBJECT_SIZE);
 
 		request = construct_crud_request(0, CRUD_CREATE, 0, 0, 0);
-		response = crud_bus_request(request, buff); 
+		response = crud_client_operation(request, buff); 
 
 		//Find first empty spot in table
 		while (strcmp(crud_file_table[fh].filename, "") != 0) {
@@ -185,7 +185,7 @@ int32_t crud_read(int16_t fd, void *buf, int32_t count) {
 	tbuf = malloc(crud_file_table[fd].length); //Size of object
 	request = construct_crud_request(
 		crud_file_table[fd].object_id, CRUD_READ, crud_file_table[fd].length, 0, 0);
-	response = crud_bus_request(request, tbuf); // Read Entire Object
+	response = crud_client_operation(request, tbuf); // Read Entire Object
 
 	if (response & 0x1) { // Check for good read
 		free(tbuf);
@@ -240,7 +240,7 @@ int32_t crud_write(int16_t fd, void *buf, int32_t count) {
 		// READ ALL OF OBJECT INTO CBUF
 		request = construct_crud_request(
 			crud_file_table[fd].object_id, CRUD_READ, crud_file_table[fd].length, 0, 0);
-		response = crud_bus_request(request, cbuf);
+		response = crud_client_operation(request, cbuf);
 		if (response & 0x1) { //MAKE SURE GOOD READ
 			free(cbuf);
 			return (-1);
@@ -254,7 +254,7 @@ int32_t crud_write(int16_t fd, void *buf, int32_t count) {
 			// DELETE OLD OBJECT
 			request = construct_crud_request(
 				crud_file_table[fd].object_id, CRUD_DELETE, 0, 0, 0);
-			response = crud_bus_request(request, buf);
+			response = crud_client_operation(request, buf);
 
 			if (response & 0x1) { //MAKE SURE GOOD DELETE
 				free(cbuf);
@@ -272,7 +272,7 @@ int32_t crud_write(int16_t fd, void *buf, int32_t count) {
 		// CREATE NEW OBJECT
 		request = construct_crud_request(
 			0, CRUD_CREATE, crud_file_table[fd].position + count, 0, 0);
-		response = crud_bus_request(request, tbuf);
+		response = crud_client_operation(request, tbuf);
 		free(tbuf);
 
 		if (response & 0x1) { //MAKE SURE GOOD CREATE
@@ -290,7 +290,7 @@ int32_t crud_write(int16_t fd, void *buf, int32_t count) {
 		//Update Object with new buf
 		request = construct_crud_request(
 			crud_file_table[fd].object_id, CRUD_UPDATE, crud_file_table[fd].length, 0, 0);
-		response = crud_bus_request(request, cbuf);
+		response = crud_client_operation(request, cbuf);
 
 		if (response & 0x1) { //MAKE SURE GOOD UPDATE
 			free(cbuf);
@@ -352,7 +352,7 @@ uint16_t crud_format(void) {
 		return (-1);
 
 	request = construct_crud_request(0, CRUD_FORMAT, 0, 0, 0);
-	response = crud_bus_request(request, NULL); // Initialize Object Store
+	response = crud_client_operation(request, NULL); // Initialize Object Store
 	if (response & 0x1) //Sucsessfull CRUD Request
 		return (-1); // Failure to Format new Object Store
 
@@ -371,7 +371,7 @@ uint16_t crud_format(void) {
 	request = construct_crud_request(
 		0, CRUD_CREATE, CRUD_FILE_SIZE * CRUD_MAX_TOTAL_FILES,
 		CRUD_PRIORITY_OBJECT, 0);
-	response = crud_bus_request(request, crud_file_table);
+	response = crud_client_operation(request, crud_file_table);
 
 	if (response & 0x1) //Sucsessfull CRUD Request
 		return (-1); // Failure to Create Priority object
@@ -400,7 +400,7 @@ uint16_t crud_mount(void) {
 	request = construct_crud_request(
 		0, CRUD_READ, CRUD_FILE_SIZE * CRUD_MAX_TOTAL_FILES,
 		CRUD_PRIORITY_OBJECT, 0);
-	response = crud_bus_request(request, crud_file_table);
+	response = crud_client_operation(request, crud_file_table);
 
 	if (response & 0x1) //Sucsessfull CRUD Request
 		return (-1); 
@@ -431,13 +431,13 @@ uint16_t crud_unmount(void) {
 	request = construct_crud_request(
 		0, CRUD_UPDATE, sizeof(CrudFileAllocationType) * CRUD_MAX_TOTAL_FILES,
 		CRUD_PRIORITY_OBJECT, 0);
-	response = crud_bus_request(request, crud_file_table);
+	response = crud_client_operation(request, crud_file_table);
 
 	if (response & 0x1) //Sucsessfull CRUD Request
 		return (-1); 
 
 	request = construct_crud_request(0, CRUD_CLOSE, 0, 0, 0);
-	response = crud_bus_request(request, NULL);
+	response = crud_client_operation(request, NULL);
 
 	if (response & 0x1) //Sucsessfull CRUD Request
 		return (-1); 
@@ -612,7 +612,7 @@ int crudIOUnitTest(void) {
 
 		// Make a fake request to get file handle, then check it
 		request = construct_crud_request(crud_file_table[0].object_id, CRUD_READ, CRUD_MAX_OBJECT_SIZE, CRUD_NULL_FLAG, 0);
-		response = crud_bus_request(request, tbuf);
+		response = crud_client_operation(request, tbuf);
 		if ((deconstruct_crud_request(response, &oid, &req, &length, &flags, &res) != 0) || (res != 0))  {
 			logMessage(LOG_ERROR_LEVEL, "Read failure, bad CRUD response [%x]", response);
 			return(-1);
