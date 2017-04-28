@@ -80,6 +80,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	{
 		written = 0;
 		while (written < ((op >> 4) & 0xFFFFFF)) {
+			printf("WRITTING\n");
 			written += write(sockfd,
 				&((char *)buf)[written], ((op >> 4) & 0xFFFFFF) - written);
 		}
@@ -95,6 +96,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	if (request == CRUD_READ) {
 		reed = 0;
 		while (reed < ((resho >> 4) & 0xFFFFFF)) {
+			printf("READING\n");
 			reed += read(sockfd, 
 				&((char *) buf)[reed], ((resho >> 4) & 0xFFFFFF) - reed);
 		}
