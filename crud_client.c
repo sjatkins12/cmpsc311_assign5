@@ -46,7 +46,7 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	int written = 0, reed = 0;
 	CrudResponse *resno = malloc(sizeof(CrudResponse)), resho;
 	CrudRequest *reqno = malloc(sizeof(CrudRequest));
-
+	printf("ENTERING CLIENT OP\n");
 	request = (op >> 28) | 0x0;
 
 	if (request == CRUD_INIT) {
