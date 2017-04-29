@@ -97,7 +97,6 @@ CrudResponse crud_client_operation(CrudRequest op, void *buf) {
 	if (request == CRUD_READ) {
 		reed = read(sockfd, buf, ((op >> 4) & 0xFFFFFF));
 		while (reed < ((resho >> 4) & 0xFFFFFF)) {
-			printf("READING\n");
 			reed += read(sockfd, 
 				&(((char *) buf)[reed]), ((resho >> 4) & 0xFFFFFF) - reed);
 		}

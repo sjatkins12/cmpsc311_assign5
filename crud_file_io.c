@@ -69,7 +69,6 @@ int16_t crud_open(char *path) {
 	CrudOID oid;
 	char *buff;
 	CrudRequest request;
-	CrudResponse response;
 
 	if (!initCheck())
 		return (-1);
@@ -88,7 +87,7 @@ int16_t crud_open(char *path) {
 		buff = malloc(CRUD_MAX_OBJECT_SIZE);
 
 		request = construct_crud_request(0, CRUD_CREATE, 0, 0, 0);
-		response = crud_client_operation(request, buff); 
+		CrudResponse response = crud_client_operation(request, buff); 
 
 		//Find first empty spot in table
 		while (strcmp(crud_file_table[fh].filename, "") != 0) {
